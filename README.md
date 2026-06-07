@@ -68,6 +68,7 @@ python3 bounce53.py -r 10.0.0.53 -d oob.pentest.io --stealth-rate
 
 # Pipe-safe output (no ANSI codes)
 python3 bounce53.py -r 10.0.0.53 -d oob.pentest.io --no-color > output.txt
+```
 
 ### Recommended: Monitor Your OOB NS in a Second Terminal
 
