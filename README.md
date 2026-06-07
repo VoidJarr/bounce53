@@ -208,21 +208,6 @@ These points (and more) are included in every generated report under the LIMITAT
 
 ***
 
-## Remediation Reference
-
-The JSON report includes the following remediation guidance:
-
-| Priority | Remediation |
-|----------|-------------|
-| **Immediate** | Restrict recursion to internal subnets only: `allow-recursion { 10.0.0.0/8; };` in BIND |
-| **Short-term** | Block outbound UDP/TCP 53 from all hosts except designated resolvers at the perimeter firewall |
-| **Medium-term** | Deploy DNS query logging with entropy anomaly alerting (Zeek + Suricata DNS ruleset) |
-| **Strategic** | Implement split DNS with hardened forwarder; deploy RPZ sinkholing; block DoH bypass to 1.1.1.1/8.8.8.8 |
-
-> Note: A hardened DNS forwarder reduces and monitors relay abuse but cannot prevent the relay channel entirely, as forwarding external queries is its core function. Whitelist-only RPZ (permit only pre-approved domains) or a protective DNS service (Cisco Umbrella, Cloudflare Gateway) are the closest approaches to genuine prevention.
-
-***
-
 ## Example Terminal Output
 
 ```
