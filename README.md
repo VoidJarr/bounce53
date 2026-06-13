@@ -1,7 +1,6 @@
 # bounce53
 
 **DNS Relay Exfiltration Assessment Tool** by VoidJarr
-
 For authorized penetration testing use only.
 
 Tests a corporate DNS resolver for susceptibility to DNS-based data exfiltration / relay abuse using a linear seven-test model (T1–T7):
@@ -49,25 +48,25 @@ No Python dependencies beyond the standard library.
 chmod +x bounce53.py
 
 # Minimum required arguments
-python3 bounce53.py -r 10.0.0.53 -d oob.attacker.com
+python3 bounce53.py -r 10.0.0.53 -d oob.foobar.com
 
 # Full example with custom output and timeout
-python3 bounce53.py -r 10.0.0.53 -d oob.pentest.io \
+python3 bounce53.py -r 10.0.0.53 -d oob.foobar.com \
     -o /tmp/client-dns-report -f json \
     --timeout 8
 
 # Quiet mode (lower footprint — skips T4 entropy, T7 bypass, and T6 rate-limit burst)
-python3 bounce53.py -r 10.0.0.53 -d oob.pentest.io \
+python3 bounce53.py -r 10.0.0.53 -d oob.foobar.com \
     --skip-ratelimit --skip-entropy --skip-bypass
 
 # TCP is on by default for T1–T6 and T5 (response). Use --udp-only for reduced noise / query volume.
-python3 bounce53.py -r 10.0.0.53 -d oob.pentest.io --udp-only
+python3 bounce53.py -r 10.0.0.53 -d oob.foobar.com --udp-only
 
 # Opt-in sustained low-and-slow rate test (after burst)
-python3 bounce53.py -r 10.0.0.53 -d oob.pentest.io --stealth-rate
+python3 bounce53.py -r 10.0.0.53 -d oob.foobar.com --stealth-rate
 
 # Pipe-safe output (no ANSI codes)
-python3 bounce53.py -r 10.0.0.53 -d oob.pentest.io --no-color > output.txt
+python3 bounce53.py -r 10.0.0.53 -d oob.foobar.com --no-color > output.txt
 ```
 
 ### Recommended: Monitor Your OOB NS in a Second Terminal
@@ -211,7 +210,7 @@ These points (and more) are included in every generated report under the LIMITAT
 ## Example Terminal Output
 
 ```
-./bounce53.py -r 10.0.0.53 -d somestring.oastify.com
+./bounce53.py -r 192.168.91.1 -d uid.oastify.com
 
   ▗▖    ▄▄▄  █  ▐▌▄▄▄▄  ▗▞▀▘▗▞▀▚▖▄▄▄▄ ▄▄▄▄
   ▐▌   █   █ ▀▄▄▞▘█   █ ▝▚▄▖▐▛▀▀▘█       █
@@ -220,12 +219,12 @@ These points (and more) are included in every generated report under the LIMITAT
 
                                by VoidJarr
 
-  [INFO] Target: 10.0.0.53  |  OOB: somestring.oastify.com  |  Timeout: 5s  |  Output: bounce53_report  |  TCP: enabled
+  [INFO] Target: 192.168.91.1  |  OOB: uid.oastify.com  |  Timeout: 5s  |  Output: bounce53_report  |  TCP: enabled
   [INFO] Capture OOB traffic or check dashboard.
 
 T1 — External Relay Viability
-  [PASS] UDP google.com + t1-relay.somestring.oastify.com → answer(s) received
-  [PASS] TCP google.com + t1-relay.somestring.oastify.com → answer(s) received
+  [PASS] UDP google.com + t1-relay.uid.oastify.com → answer(s) received
+  [PASS] TCP google.com + t1-relay.uid.oastify.com → answer(s) received
 
 T2 — Record Type Coverage
   [PASS] UDP relayed: A, TXT, MX, CNAME, NS, AAAA
@@ -238,8 +237,8 @@ T3 — Query Payload: Label Length
   [PASS] UDP 63-char label  (DNS spec maximum) → resolver returned NXDOMAIN/NOERROR (heuristic)
   [INFO] UDP max passing chars: 63
   [PASS] TCP max passing chars: 63
-  [INFO] OOB check: 60-char: ifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifau.somestring.oastify.com
-                    63-char: ifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqk.somestring.oastify.com
+  [INFO] OOB check: 60-char: ifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifau.uid.oastify.com
+                    63-char: ifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqkbifaucqk.uid.oastify.com
 
 T4 — Query Payload: Entropy / IDS
   [INFO] UDP baseline reached: True
@@ -252,19 +251,19 @@ T4 — Query Payload: Entropy / IDS
   [PASS] TCP base32 encoded  (random bytes, max entropy, 40 chars) → reached auth NS
   [PASS] TCP hex encoded     (32-char hex string) → reached auth NS
   [INFO] TCP patterns blocked: 0/3
-  [INFO] OOB check: ifaucqkbifaucqkbifaucqkbifaucqkbifaucqkb-t4b32rep.somestring.oastify.com
-                    boczlovsix25lymp4366yts2iik3juvlopv35w5j-t4b32rnd.somestring.oastify.com
-                    4f3a9c2b7e1d6f8a0b5c9d3e7f2a4b6c-t4hex.somestring.oastify.com
+  [INFO] OOB check: ifaucqkbifaucqkbifaucqkbifaucqkbifaucqkb-t4b32rep.uid.oastify.com
+                    ja4ffihnng3vqyzjhrh4gwlodbze2tveng5klhjb-t4b32rnd.uid.oastify.com
+                    4f3a9c2b7e1d6f8a0b5c9d3e7f2a4b6c-t4hex.uid.oastify.com
 
 T5 — Response Payload Capacity
-  [PASS] UDP TXT payload → 66 chars via t7-payload.somestring.oastify.com
-  [PASS] TCP TXT payload → 66 chars via t7-payload.somestring.oastify.com
+  [PASS] UDP TXT payload → 66 chars via t5-payload.uid.oastify.com
+  [PASS] TCP TXT payload → 66 chars via t5-payload.uid.oastify.com
 
 T6 — Rate Limiting & Sustained Throughput
-  [INFO] UDP burst: 30/30 @ 11.6 QPS (2.6s)
-  [INFO] TCP burst: 30/30 @ 11.4 QPS (2.6s)
-  [WARN] No rate limiting detected — 30/30 resolved at 11.6 QPS (UDP burst)
-  [INFO] OOB check: *.t6-ratelimit.somestring.oastify.com
+  [INFO] UDP burst: 30/30 @ 26.9 QPS (1.1s)
+  [INFO] TCP burst: 30/30 @ 32.3 QPS (0.9s)
+  [WARN] No rate limiting detected — 30/30 resolved at 26.9 QPS (UDP burst)
+  [INFO] OOB check: *.t6-ratelimit.uid.oastify.com
 
 T7 — Direct DNS Egress Bypass
   [PASS] UDP/53: ['8.8.8.8', '1.1.1.1', '9.9.9.9']
@@ -275,9 +274,9 @@ T7 — Direct DNS Egress Bypass
 ══════════════════════════════════════════════════════════════
 ASSESSMENT SUMMARY
 ══════════════════════════════════════════════════════════════
-  Target Resolver : 10.0.0.53
-  OOB Domain      : somestring.oastify.com
-  Duration        : 13.0s
+  Target Resolver : 192.168.91.1
+  OOB Domain      : uid.oastify.com
+  Duration        : 11.4s
   Overall Risk    : CRITICAL
   Note            : verify T3/T4/T6 via OOB; T7 reflects this host only.
 
@@ -288,7 +287,7 @@ ASSESSMENT SUMMARY
   T3 — Query Payload: Label Length           HIGH      Resolver returns NXDOMAIN/NOERROR for labels up to 63 chars
   T4 — Query Payload: Entropy / IDS          HIGH      No SERVFAIL/drops for tested patterns
   T5 — Response Payload Capacity             MEDIUM    Moderate TXT payload relayed (66 chars) — chunked exfil viable
-  T6 — Rate Limiting & Sustained Throughput  HIGH      No rate limiting detected — 30/30 resolved at 11.6 QPS (UDP burst)
+  T6 — Rate Limiting & Sustained Throughput  HIGH      No rate limiting detected — 30/30 resolved at 26.9 QPS (UDP burst)
   T7 — Direct DNS Egress Bypass              CRITICAL  Direct DNS egress available — filtering absent or incomplete
 
   [INFO] Report saved → bounce53_report.txt (raw queries: 108)

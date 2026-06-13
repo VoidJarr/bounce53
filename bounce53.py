@@ -827,7 +827,7 @@ def test_rate_limiting(resolver, oob_domain, timeout, udp_only=False, stealth_ra
 def _t5_probe(resolver: str, oob_domain: str, timeout: int, tcp: bool = False) -> tuple[dict, list]:
     """Inner probe for response capacity TXT size over one transport."""
     raw = []
-    oob_txt_fqdn  = f"t7-payload.{oob_domain}"
+    oob_txt_fqdn  = f"t5-payload.{oob_domain}"
     rich_oob    = dig_capture(resolver, oob_txt_fqdn, "TXT", timeout, short=True, tcp=tcp)
     rich_google = dig_capture(resolver, "google.com", "TXT", timeout, short=True, tcp=tcp)
     raw.extend([rich_oob, rich_google])
@@ -850,7 +850,7 @@ def _t5_probe(resolver: str, oob_domain: str, timeout: int, tcp: bool = False) -
 
 
 def test_response_capacity(resolver, oob_domain, timeout, udp_only=False, raw_collector: list | None = None) -> dict:
-    """T5: Response payload capacity (TXT size + EDNS probes, truncation, TCP fallback). Pure: returns result dict, no printing."""
+    """T5: Response Payload Capacity (TXT + EDNS probes + truncation + TCP fallback). Pure: returns result dict, no printing."""
     if raw_collector is None:
         raw_collector = []
 
@@ -896,15 +896,11 @@ def test_response_capacity(resolver, oob_domain, timeout, udp_only=False, raw_co
         "txt_payload_chars": payload_len,
         "note": "TXT response size + EDNS probes (512/1232/4096), truncation, and TCP fallback. Values from this host only.",
     }
-    # EDNS logic continues below (no prints); caller will assign the final result
-    # (the rest of the function body for EDNS/truncation is kept as-is after this point)
 
     # EDNS bufsize probes + truncation/TCP fallback test
     # Use payload name if available, else google fallback.
-    if udp_src and ("t7-payload" in udp_src or oob_domain.split(".")[0] in udp_src):
-        edns_name = f"t7-payload.{oob_domain}"
-    else:
-        edns_name = "google.com"
+    payload_fqdn = f"t5-payload.{oob_domain}"
+    edns_name = payload_fqdn if udp_len > 0 else "google.com"
     edns_probes = []
     truncation_observed = False
     for bs in (512, 1232, 4096):
